@@ -3,6 +3,9 @@ const app = express()
 const mongoose = require('mongoose');
 const port = 3000
 var cors = require('cors')
+const TaskRouter = require("./src/routes/taskRoutes")
+const UserRouter = require("./src/routes/userRoutes")
+
 
 var allowlist = ['http://localhost:5173', 'http://127.0.0.1:5173']
 var corsOptionsDelegate = function (req, callback) {
@@ -22,50 +25,12 @@ async function main() {
 
 main()
 
-
-const TaskSchema = new mongoose.Schema({
-    task: String,
-    isCompleted: Boolean,
-    user: String
-});
-
-const Task = mongoose.model('task', TaskSchema);
-
-// get
-// post
-// put
-// delete
-
-// CRUD
-// R - get all data
-
 app.use(cors(corsOptionsDelegate))
 
 app.use(express.json())
 
-app.get('/', async (req, res) => {
-  let tasks = await Task.find({});
-  res.send(tasks)
-})
-
-app.post('/', (req, res) => {
-  console.log(req.body.data)
-  Task.create(req.body.data)
-  res.send("Added successfully")
-})
-
-app.put('/:id', (req, res) => {
-    let id = req.params.id
-    let task = req.body
-    Task.findByIdAndUpdate(id, task).exec()
-    res.send("Edit task")
-})
-
-app.delete("/:id", (req, res) => {
-  let id = req.params.id
-    Task.findByIdAndDelete(id).exec()
-    res.send("Task Deleted")
-})
+app.use("/task", TaskRouter)
+app.use("/user", UserRouter)
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
